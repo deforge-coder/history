@@ -1,0 +1,684 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#343638">
+<title>Новиков. Цена просвещения</title>
+<style>
+:root{
+  --bg:#343638;--dark:#242628;--paper:#e8dfc9;--ink:#302e28;
+  --gold:#c9a96b;--red:#c42f35;--green:#a9c19b;--muted:#bdb5a5;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;min-height:100vh;color:var(--paper);
+  background:radial-gradient(ellipse at 20% 10%,#494b4d,transparent 48%),var(--bg);
+  font-family:Georgia,"Times New Roman",serif;overflow-x:hidden;
+}
+button{font:inherit}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.ambient{position:fixed;inset:0;overflow:hidden;pointer-events:none;opacity:.12;z-index:0}
+.decor{position:absolute;color:#e8dfc9;animation:float 8s ease-in-out infinite alternate}
+.d1{top:7%;left:-20px;font-size:95px;transform:rotate(-12deg)}
+.d2{top:36%;right:-12px;font-size:85px}
+.d3{bottom:10%;left:2%;font-size:75px}
+.d4{top:64%;right:5%;font-size:68px}
+.d5{top:4%;right:5%;font-size:65px}
+@keyframes float{to{translate:0 12px}}
+.app{position:relative;z-index:1;width:100%;max-width:760px;margin:auto;padding:18px 13px calc(35px + env(safe-area-inset-bottom))}
+.masthead{text-align:center;padding:12px 5px 18px;border-bottom:1px solid #c9b78e55}
+.eyebrow{font:10px Arial,sans-serif;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold)}
+h1{font-size:clamp(34px,9vw,52px);line-height:1;margin:13px 0 9px;letter-spacing:-1px}
+.subtitle{font-size:13px;line-height:1.6;color:#c9c0ae;max-width:440px;margin:auto}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:15px 0}
+.stat{background:var(--dark);border:1px solid #ffffff16;padding:10px 4px;text-align:center;border-radius:3px;min-width:0}
+.stat-label{font:9px Arial,sans-serif;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);line-height:1.5}
+.stat-value{display:block;margin-top:6px;font-size:clamp(16px,4.5vw,23px);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stat-value.danger{color:#ff6868}
+.progress-area{margin:16px 0 22px}
+.progress-label{display:flex;justify-content:space-between;gap:8px;font:10px Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#c7c0b3;margin-bottom:8px}
+.progress-track{height:4px;background:#202123;border-radius:5px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--gold);transition:width .4s}
+.heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.heading h2{font-size:18px;font-weight:normal;margin:0}
+.heading span{font:10px Arial,sans-serif;color:var(--muted);letter-spacing:.7px}
+.card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.chapter{min-width:0;min-height:119px;padding:12px 5px;background:#282a2c;color:var(--paper);border:1px solid #a99b7c55;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;transition:.25s;overflow-wrap:anywhere}
+.chapter .num{font:10px Arial,sans-serif;letter-spacing:2px;color:var(--gold)}
+.chapter .ico{font-size:24px}
+.chapter .ctitle{font-size:12px;line-height:1.4}
+.chapter.locked{opacity:.55}
+.chapter.available{cursor:pointer;border-color:var(--gold);box-shadow:0 0 18px #c9a96b20;animation:unlock .5s ease both}
+.chapter.available:active{transform:scale(.96)}
+.chapter.completed{border-color:#84947b;background:#333b34}
+@keyframes unlock{from{opacity:.2;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.final-chapter{grid-column:1/-1;min-height:86px;flex-direction:row;gap:12px;background:#3a3529;border-color:var(--gold)}
+.final-chapter .ctitle{font-size:15px}
+.final-chapter .desc{font-size:11px;color:#c7bda8;margin-top:4px}
+.note{text-align:center;font-size:12px;color:var(--muted);line-height:1.6;margin:15px 0}
+.panel{margin-top:18px;padding:15px;background:#282a2c;border:1px solid #c9a96b66}
+.panel h3{font-size:19px;color:var(--gold);font-weight:normal;margin:0 0 10px}
+.panel p{font-size:13px;line-height:1.7;color:#ddd3bf}
+.secret-box{display:flex;gap:14px;align-items:center}
+.secret-box img{width:84px;height:100px;object-fit:cover;border:1px solid #c9a96b66}
+.secret-question{font-size:36px;color:var(--gold);min-width:70px;text-align:center}
+.hidden{display:none!important}
+.overlay{position:fixed;inset:0;z-index:20;background:#151617e8;display:flex;justify-content:center;align-items:flex-start;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{position:relative;width:100%;max-width:570px;margin:auto 0;padding:22px 17px;background:repeating-linear-gradient(0deg,transparent,transparent 27px,#6d624411 28px),var(--paper);color:var(--ink);border:1px solid #b9a77f;box-shadow:0 20px 70px #0008;animation:rise .3s ease}
+.modal:before{content:"";position:absolute;inset:6px;border:1px solid #6e63442e;pointer-events:none}
+.mc{position:relative;z-index:1}
+@keyframes rise{from{transform:translateY(22px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-top{display:flex;align-items:center;justify-content:space-between;gap:10px;font:10px Arial,sans-serif;text-transform:uppercase;letter-spacing:1.3px;color:#766d5a}
+.close{min-width:38px;min-height:38px;border:1px solid #71684d66;background:transparent;color:var(--ink);font-size:21px;cursor:pointer}
+.modal h2{font-size:clamp(25px,7vw,35px);line-height:1.13;margin:15px 0 12px}
+.description{font-size:14px;line-height:1.7;color:#454238;margin:0 0 18px}
+.options{display:flex;flex-direction:column;gap:9px}
+.option{width:100%;min-height:53px;text-align:left;padding:11px 10px;display:flex;align-items:flex-start;gap:10px;background:#f2ead8;border:1px solid #b9ac90;color:#302e28;cursor:pointer;font-size:14px;line-height:1.5}
+.option:active{background:#e2d4b7}
+.option:disabled{opacity:.55;cursor:default}
+.letter{flex:0 0 27px;width:27px;height:27px;display:grid;place-items:center;background:#393833;color:var(--paper);border-radius:50%;font-size:12px}
+.option-text{flex:1}
+.paper-footer{border-top:1px solid #8b806455;margin-top:17px;padding-top:12px;text-align:center;color:#766d5a;font-size:10px;line-height:1.5}
+.primary{width:100%;min-height:47px;padding:12px;margin-top:14px;border:1px solid #292823;background:#333330;color:var(--paper);cursor:pointer}
+.warning-label{text-align:center;color:var(--red);font:bold 11px Arial,sans-serif;letter-spacing:2px;text-transform:uppercase}
+.catherine{display:block;width:100%;max-height:185px;object-fit:contain;margin:12px auto}
+.eye-wrap{display:flex;justify-content:center;margin:18px}
+.eye{position:relative;width:76px;height:45px;background:#c52b30;border-radius:80% 15%;transform:rotate(45deg);box-shadow:0 0 22px #c52b3070;animation:pulse 2s infinite}
+.eye:before{content:"";position:absolute;width:32px;height:32px;background:#f0d8c4;border-radius:50%;top:6px;left:22px}
+.eye:after{content:"";position:absolute;width:16px;height:16px;background:#a10c17;border:3px solid #f0d8c4;border-radius:50%;top:13px;left:30px}
+@keyframes pulse{50%{box-shadow:0 0 30px #c52b30}}
+.reward{position:fixed;z-index:40;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,390px);max-height:82vh;overflow:auto;padding:18px;background:#252729;color:var(--paper);border:1px solid var(--gold);box-shadow:0 12px 45px #0009;opacity:0;pointer-events:none}
+.reward.show{animation:rewardIn .3s ease forwards}
+@keyframes rewardIn{from{opacity:0;scale:.93}to{opacity:1;scale:1}}
+.reward h3{font-size:19px;font-weight:normal;margin:0 0 12px;color:var(--gold)}
+.reward .line{font-size:13px;line-height:1.9}
+.reward .net{font-size:27px;margin:10px 0}
+.positive{color:var(--green)}.negative{color:#ff7777}
+.finance-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.finance-cell{background:#1d1f20;padding:10px;text-align:center}
+.finance-cell small{display:block;color:var(--muted);font:10px Arial,sans-serif;text-transform:uppercase;letter-spacing:.5px}
+.finance-cell strong{
+  display:block;
+  margin-top:6px;
+  font-size:17px;
+  overflow-wrap:anywhere;
+  color:#ffffff;
+}
+.capital-change{padding:10px;border-top:1px solid #ffffff22;border-bottom:1px solid #ffffff22;line-height:1.8;font-size:13px}
+.transactions{display:flex;flex-direction:column;gap:9px}
+.transaction{background:#202224;border:1px solid #ffffff17;padding:12px}
+.transaction-head{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin-bottom:8px}
+.transaction-head span:last-child{color:var(--gold);white-space:nowrap}
+.transaction-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.transaction-grid div{background:#303234;padding:8px 5px;text-align:center}
+.transaction-grid small{display:block;color:var(--muted);font:9px Arial,sans-serif;text-transform:uppercase;line-height:1.5}
+.transaction-grid strong{display:block;font-size:12px;margin-top:4px;overflow-wrap:anywhere}
+.transaction-foot{font-size:11px;color:#c6bda9;margin-top:8px;line-height:1.6}
+.history-note{font-size:11px;line-height:1.6;color:var(--muted);margin:10px 0}
+.endings{font-size:14px;line-height:1.8}
+.endings img{display:block;max-width:150px;max-height:180px;object-fit:contain;margin:12px auto}
+@media(min-width:600px){
+  .app{padding-left:22px;padding-right:22px}
+  .chapter{min-height:135px}
+  .modal{padding:27px 25px}
+}
+@media(max-width:360px){
+  .card-grid{gap:6px}
+  .chapter{min-height:110px}
+  .chapter .ctitle{font-size:11px}
+  .stat-label{font-size:8px}
+  .transaction-grid strong{font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true">
+  <div class="decor d1">⌨</div><div class="decor d2">✒</div>
+  <div class="decor d3">▤</div><div class="decor d4">✉</div>
+  <div class="decor d5">❧</div>
+</div>
+
+<main class="app">
+  <header class="masthead">
+    <div class="eyebrow">Издательское дело · XVIII век</div>
+    <h1>Цена<br>просвещения</h1>
+    <p class="subtitle">Примерьте на себя роль Николая Новикова. Развивайте издательское дело, распоряжайтесь капиталом и решайте, чем вы готовы рискнуть ради просвещения.</p>
+  </header>
+
+  <section class="stats" aria-label="Показатели">
+    <div class="stat"><div class="stat-label">Капитал</div><strong class="stat-value" id="capital">100 000 ₽</strong></div>
+    <div class="stat"><div class="stat-label">Внимание властей</div><strong class="stat-value" id="risk">0</strong></div>
+    <div class="stat"><div class="stat-label">Тайные баллы</div><strong class="stat-value" id="novikov">?</strong></div>
+  </section>
+
+  <section class="progress-area">
+    <div class="progress-label"><span>Путь издателя</span><span id="progressText">0 из 6 решений</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </section>
+
+  <div class="heading"><h2>Архив издателя</h2><span>ОТКРЫВАЙТЕ ПО ПОРЯДКУ</span></div>
+  <section class="card-grid" id="cardGrid">
+    <button class="chapter available" data-card="0"><span class="num">01</span><span class="ico">🔓</span><span class="ctitle">Каналы сбыта</span></button>
+    <button class="chapter locked" data-card="1" disabled><span class="num">02</span><span class="ico">🔒</span><span class="ctitle">Масонская ложа</span></button>
+    <button class="chapter locked" data-card="2" disabled><span class="num">03</span><span class="ico">🔒</span><span class="ctitle">Что издавать?</span></button>
+    <button class="chapter locked" data-card="3" disabled><span class="num">04</span><span class="ico">🔒</span><span class="ctitle">Оплата труда</span></button>
+    <button class="chapter locked" data-card="4" disabled><span class="num">05</span><span class="ico">🔒</span><span class="ctitle">Письмо Павла</span></button>
+    <button class="chapter locked" data-card="5" disabled><span class="num">06</span><span class="ico">🔒</span><span class="ctitle">Долги издателя</span></button>
+    <button class="chapter locked final-chapter" id="finalCard" disabled>
+      <span class="ico">🔒</span><span><span class="ctitle">Итоговая судьба</span><span class="desc">Откроется после шести решений</span></span>
+    </button>
+  </section>
+
+  <p class="note">Каждое решение влияет на капитал. Расходы и доходы учитываются отдельно, даже если выбранный способ кажется абсурдным.</p>
+
+  <section class="panel" id="secretPanel">
+    <h3>Неизвестный показатель</h3>
+    <div class="secret-box">
+      <div class="secret-question" id="secretMark">?</div>
+      <div><p id="secretDescription">Что скрывается за этим показателем? Сделайте первый выбор, чтобы узнать больше.</p></div>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="historyPanel">
+    <h3>Финансовая история</h3>
+    <p>В каждой операции расходы вычитаются из капитала, а доходы прибавляются к нему. Итог операции равен доходам минус расходы.</p>
+    <div class="transactions" id="transactions"></div>
+  </section>
+
+  <section class="panel hidden" id="finalSummary">
+    <h3>Итоги издательского пути</h3>
+    <div id="finalSummaryContent"></div>
+  </section>
+</main>
+
+<div class="overlay hidden" id="questionOverlay" role="dialog" aria-modal="true">
+  <div class="modal"><div class="mc">
+    <div class="modal-top"><span id="questionNumber">Карточка 01</span><button class="close" id="closeQuestion" aria-label="Закрыть">×</button></div>
+    <h2 id="questionTitle"></h2>
+    <p class="description" id="questionDescription"></p>
+    <div class="options" id="options"></div>
+    <div class="paper-footer">Решение повлияет на капитал и дальнейшую судьбу издателя.</div>
+  </div></div>
+</div>
+
+<div class="overlay hidden" id="warningOverlay" role="dialog" aria-modal="true">
+  <div class="modal"><div class="mc">
+    <div class="warning-label">Императорский надзор</div>
+    <img src="photo1.png" class="catherine" alt="Екатерина II" onerror="this.style.display='none'">
+    <div class="eye-wrap"><div class="eye"></div></div>
+    <h2 style="text-align:center">Вы привлекли внимание властей</h2>
+    <p class="description">Ваши решения больше не остаются незамеченными. За деятельностью издателя наблюдают. Каждый следующий риск приближает вас к критической черте.</p>
+    <button class="primary" id="closeWarning">Продолжить</button>
+    <div class="paper-footer">Внимание властей сохраняется до конца игры.</div>
+  </div></div>
+</div>
+
+<div class="overlay hidden" id="resultsOverlay" role="dialog" aria-modal="true">
+  <div class="modal"><div class="mc">
+    <div class="modal-top"><span id="resultKicker">Результаты решения</span><span id="resultStep">01 / 06</span></div>
+    <h2 id="resultTitle">Операция завершена</h2>
+    <p class="description" id="resultDescription"></p>
+    <div class="finance-summary">
+      <div class="finance-cell"><small>Потрачено</small><strong id="resultSpent">0 ₽</strong></div>
+      <div class="finance-cell"><small>Заработано</small><strong id="resultEarned">0 ₽</strong></div>
+    </div>
+    <div class="capital-change">
+      <div>Итог операции: <strong id="resultNet">0 ₽</strong></div>
+      <div>Капитал до решения: <strong id="capitalBefore">100 000 ₽</strong></div>
+      <div>Капитал после решения: <strong id="capitalAfter">100 000 ₽</strong></div>
+    </div>
+    <div id="resultFlags" class="description" style="margin-top:12px;margin-bottom:0"></div>
+    <button class="primary" id="continueResults">Продолжить</button>
+    <div class="paper-footer">Финансовые суммы являются игровыми условными значениями.</div>
+  </div></div>
+</div>
+
+<div class="overlay hidden" id="endingOverlay" role="dialog" aria-modal="true">
+  <div class="modal"><div class="mc">
+    <div class="modal-top"><span>Последняя страница</span><span>ФИНАЛ</span></div>
+    <div class="endings" id="endingContent"></div>
+    <button class="primary" id="closeEnding">Вернуться к результатам</button>
+    <button class="primary" id="restartGame">Начать заново</button>
+    <div class="paper-footer">История издателя завершена.</div>
+  </div></div>
+</div>
+
+<div class="reward" id="rewardToast" aria-live="polite">
+  <h3 id="toastTitle">Операция завершена</h3>
+  <div class="line" id="toastBody"></div>
+</div>
+
+<script>
+"use strict";
+
+const INITIAL_CAPITAL = 100000;
+const RISK_LIMIT = 4;
+const money = value => new Intl.NumberFormat("ru-RU").format(value) + " ₽";
+const signedMoney = value => (value > 0 ? "+" : value < 0 ? "−" : "") + money(Math.abs(value));
+
+/*
+  spent = расходы по выбранному способу
+  earned = доходы по выбранному способу
+  net = earned - spent
+  Новый капитал = старый капитал + net
+
+  Все суммы здесь условные игровые значения.
+  Они не являются точными историческими данными.
+*/
+
+const questions = [
+{
+  title: "Как наладить каналы сбыта продукции?",
+  description: "Вы развиваете издательское дело. Выберите способ распространения продукции.",
+  options: [
+    {letter:"А",text:"Раздавать в  ̶м̶е̶т̶р̶о̶ у извозчиков",spent:12000,earned:4000},
+    {letter:"Б",text:"Заставлять студентов покупать газеты и учебники.",spent:5000,earned:9000},
+    {letter:"В",text:"Договориться с культурными местами (театры, оперы) и книжными лавками о сотрудничестве",spent:10000,earned:26000},
+    {letter:"Г",text:"Сделать свою книжную лавку без блекджека, но с библиотекой-читальней",spent:18000,earned:44000,novikov:true}
+  ]
+},
+{
+  title: "Вы часть масонской ложи. Как будете вести свою деятельность?",
+  description: "Ваше участие в масонской ложе может повлиять на безопасность и репутацию издателя.",
+  options: [
+    {letter:"А",text:"Подпольно",spent:7000,earned:9000},
+    {letter:"Б",text:"Открыто, пусть все знают",spent:8000,earned:18000,risk:true,novikov:true},
+    {letter:"В",text:"Уехать в другую страну пока не признали иноагентом/экстремистом",spent:22000,earned:3000},
+    {letter:"Г",text:"Писать доносы на других массонов",spent:3000,earned:5000}
+  ]
+},
+{
+  title: "Что издавать?",
+  description: "Выберите направление издательской деятельности. Несколько направлений можно сочетать, но это потребует дополнительных ресурсов.",
+  options: [
+    {letter:"А",text:"Учебники, книги по науке",spent:10000,earned:23000},
+    {letter:"Б",text:"Переводы литературных и философских произведений",spent:12000,earned:26000},
+    {letter:"В",text:"Массонские книги",spent:9000,earned:19000,risk:true},
+    {letter:"Г",text:"Газеты и журналы",spent:8000,earned:22000},
+    {letter:"Д",text:"Все сразу",spent:35000,earned:65000,risk:true,novikov:true}
+  ]
+},
+{
+  title: "Сколько платить работникам (переводчикам, журналистам)?",
+  description: "Качество изданий зависит от людей, но расходы на команду могут оказаться значительными.",
+  options: [
+    {letter:"А",text:"Больше, чем кто-либо в России",spent:30000,earned:45000,risk:true,novikov:true},
+    {letter:"Б",text:"Как и в других издательствах",spent:14000,earned:25000},
+    {letter:"В",text:"Столько, сколько нужно, чтобы не умереть от голода",spent:6000,earned:9000},
+    {letter:"Г",text:"Не платить. Им нужна только пища для разума",spent:2000,earned:5000}
+  ]
+},
+{
+  title: "Павел в личном письме просит прислать ему массонские книги. Что делать?",
+  description: "Письмо ставит вас перед выбором между безопасностью и готовностью продолжать свою деятельность.",
+  options: [
+    {letter:"А",text:"Прислать назло Екатерине II (она ненавидит массонов)",spent:12000,earned:5000,risk:true,novikov:true},
+    {letter:"Б",text:"Вежливо отказать",spent:2000,earned:4000},
+    {letter:"В",text:"Невежливо отказать - сын все равно в немилости у императрицы",spent:1000,earned:2000},
+    {letter:"Г",text:"Сделать вид, что письмо не приходило",spent:3000,earned:3000}
+  ]
+},
+{
+  title: "Взять ли на себя долги издательства? (300.000 рублей)",
+  description: "Издательству необходимо решить вопрос с долгом. Выберите, как поступить с обязательствами.",
+  options: [
+    {letter:"А",text:"Объявить себя банкротом",spent:5000,earned:0},
+    {letter:"Б",text:"Взять долг на себя, заложить имение и закончить жизнь в бедности",spent:300000,earned:0,risk:true,novikov:true},
+    {letter:"В",text:"Повесить долг на других массонов",spent:3000,earned:10000},
+    {letter:"Г",text:"Новиковы - не Ланистеры, платить долги не обязательно",spent:0,earned:5000}
+  ]
+}
+];
+
+const state = {
+  capital: INITIAL_CAPITAL,
+  risk: 0,
+  novikovPoints: 0,
+  completed: 0,
+  transactions: [],
+  warningShown: false,
+  pendingWarning: false,
+  currentQuestion: null,
+  currentResult: null,
+  finalShown: false
+};
+
+const $ = id => document.getElementById(id);
+const questionOverlay = $("questionOverlay");
+const warningOverlay = $("warningOverlay");
+const resultsOverlay = $("resultsOverlay");
+const endingOverlay = $("endingOverlay");
+const rewardToast = $("rewardToast");
+
+function formatRisk(){
+  $("risk").textContent = String(state.risk);
+  $("risk").classList.toggle("danger", state.risk >= RISK_LIMIT);
+}
+
+function renderStats(){
+  $("capital").textContent = money(state.capital);
+  $("capital").classList.toggle("danger", state.capital < 0);
+  formatRisk();
+
+  // Скрытые баллы не раскрываются до завершения игры.
+  $("novikov").textContent = state.completed === 6 ? String(state.novikovPoints) : "?";
+
+  $("progressText").textContent = state.completed + " из 6 решений";
+  $("progressFill").style.width = (state.completed / 6 * 100) + "%";
+  renderCards();
+  renderHistory();
+}
+
+function renderCards(){
+  document.querySelectorAll("[data-card]").forEach(button => {
+    const index = Number(button.dataset.card);
+    const completed = index < state.completed;
+    const available = index === state.completed && state.completed < 6;
+    button.classList.toggle("completed", completed);
+    button.classList.toggle("available", available);
+    button.classList.toggle("locked", !completed && !available);
+    button.disabled = !available;
+    button.querySelector(".ico").textContent = completed ? "✓" : available ? "🔓" : "🔒";
+    if(completed){
+      button.querySelector(".ctitle").textContent =
+        ["Каналы сбыта","Масонская ложа","Что издавать?","Оплата труда","Письмо Павла","Долги издателя"][index] + " · готово";
+    }
+  });
+
+  const finalCard = $("finalCard");
+  const finalAvailable = state.completed === 6;
+  finalCard.disabled = !finalAvailable;
+  finalCard.classList.toggle("available", finalAvailable);
+  finalCard.classList.toggle("locked", !finalAvailable);
+  finalCard.querySelector(".ico").textContent = finalAvailable ? "✦" : "🔒";
+  finalCard.querySelector(".desc").textContent = finalAvailable
+    ? "Открыть финал и узнать судьбу издателя"
+    : "Откроется после шести решений";
+}
+
+function renderHistory(){
+  const panel = $("historyPanel");
+  const list = $("transactions");
+  if(state.transactions.length === 0){
+    panel.classList.add("hidden");
+    return;
+  }
+  panel.classList.remove("hidden");
+  list.innerHTML = "";
+
+  state.transactions.forEach(tx => {
+    const item = document.createElement("article");
+    item.className = "transaction";
+
+    const head = document.createElement("div");
+    head.className = "transaction-head";
+    const title = document.createElement("span");
+    title.textContent = (tx.index + 1) + ". " + tx.questionTitle;
+    const net = document.createElement("span");
+    net.className = tx.net >= 0 ? "positive" : "negative";
+    net.textContent = signedMoney(tx.net);
+    head.append(title, net);
+
+    const grid = document.createElement("div");
+    grid.className = "transaction-grid";
+    [
+      ["Потрачено", money(tx.spent)],
+      ["Заработано", money(tx.earned)],
+      ["Итог", signedMoney(tx.net)]
+    ].forEach(([label,value]) => {
+      const cell = document.createElement("div");
+      const small = document.createElement("small");
+      small.textContent = label;
+      const strong = document.createElement("strong");
+      strong.textContent = value;
+      strong.className = label === "Итог" ? (tx.net >= 0 ? "positive" : "negative") : "";
+      cell.append(small,strong);
+      grid.append(cell);
+    });
+
+    const foot = document.createElement("div");
+    foot.className = "transaction-foot";
+    foot.textContent = "Капитал: " + money(tx.before) + " → " + money(tx.after);
+
+    item.append(head,grid,foot);
+    list.append(item);
+  });
+}
+
+function openQuestion(index){
+  if(index !== state.completed || index >= questions.length) return;
+  state.currentQuestion = index;
+  const question = questions[index];
+
+  $("questionNumber").textContent = "Карточка " + String(index + 1).padStart(2,"0");
+  $("questionTitle").textContent = question.title;
+  $("questionDescription").textContent = question.description;
+  const options = $("options");
+  options.innerHTML = "";
+
+  question.options.forEach(option => {
+    const button = document.createElement("button");
+    button.className = "option";
+
+    const letter = document.createElement("span");
+    letter.className = "letter";
+    letter.textContent = option.letter;
+
+    const text = document.createElement("span");
+    text.className = "option-text";
+    text.textContent = option.text;
+
+    button.append(letter,text);
+    button.addEventListener("click", () => chooseOption(index, option));
+    options.append(button);
+  });
+
+  questionOverlay.classList.remove("hidden");
+}
+
+function chooseOption(index, option){
+  if(index !== state.completed) return;
+
+  const question = questions[index];
+  const before = state.capital;
+  const spent = Math.max(0, Number(option.spent) || 0);
+  const earned = Math.max(0, Number(option.earned) || 0);
+  const net = earned - spent;
+  const after = before + net;
+
+  // Учитываем операцию ровно один раз.
+  state.capital = after;
+  if(option.risk) state.risk++;
+  if(option.novikov) state.novikovPoints++;
+
+  const tx = {
+    index,
+    questionTitle: question.title,
+    answer: option.text,
+    spent,
+    earned,
+    net,
+    before,
+    after,
+    risk: !!option.risk,
+    novikov: !!option.novikov
+  };
+  state.transactions.push(tx);
+  state.completed++;
+  state.currentResult = tx;
+  state.pendingWarning = !!option.risk && !state.warningShown;
+
+  questionOverlay.classList.add("hidden");
+  renderStats();
+  showResult(tx);
+}
+
+function showResult(tx){
+  $("resultKicker").textContent = "Финансовый отчёт";
+  $("resultStep").textContent = String(tx.index + 1).padStart(2,"0") + " / 06";
+  $("resultTitle").textContent = "Результаты решения";
+  $("resultDescription").textContent = "Ваш выбор: " + tx.answer;
+  $("resultSpent").textContent = money(tx.spent);
+  $("resultEarned").textContent = money(tx.earned);
+
+  const netElement = $("resultNet");
+  netElement.textContent = signedMoney(tx.net);
+  netElement.className = tx.net >= 0 ? "positive" : "negative";
+  $("capitalBefore").textContent = money(tx.before);
+  $("capitalAfter").textContent = money(tx.after);
+
+  const flags = [];
+  if(tx.risk) flags.push("⚑ Внимание властей увеличилось.");
+  if(tx.novikov) flags.push("Получен тайный балл.");
+  if(!tx.risk) flags.push("Это решение не привлекло дополнительного внимания властей.");
+  if(tx.net < 0) flags.push("Убыток операции составил " + money(Math.abs(tx.net)) + ".");
+  if(tx.net > 0) flags.push("Прибыль операции составила " + money(tx.net) + ".");
+  if(tx.net === 0) flags.push("Операция не изменила размер капитала.");
+  $("resultFlags").textContent = flags.join(" ");
+
+  resultsOverlay.classList.remove("hidden");
+}
+
+function closeResults(){
+  resultsOverlay.classList.add("hidden");
+  if(state.pendingWarning){
+    state.pendingWarning = false;
+    state.warningShown = true;
+    warningOverlay.classList.remove("hidden");
+    return;
+  }
+  if(state.completed === 6){
+    $("finalCard").classList.add("available");
+  }
+}
+
+function showToast(tx){
+  $("toastTitle").textContent = tx.net >= 0 ? "Операция завершена" : "Операция принесла убыток";
+  $("toastBody").innerHTML =
+    "Потрачено: <strong>" + money(tx.spent) + "</strong><br>" +
+    "Заработано: <strong>" + money(tx.earned) + "</strong><br>" +
+    "Итог операции: <strong class='" + (tx.net >= 0 ? "positive" : "negative") + "'>" + signedMoney(tx.net) + "</strong><br>" +
+    "Капитал: " + money(tx.before) + " → " + money(tx.after);
+  rewardToast.classList.remove("show");
+  void rewardToast.offsetWidth;
+  rewardToast.classList.add("show");
+  window.setTimeout(() => rewardToast.classList.remove("show"), 3200);
+}
+
+function revealSecret(){
+  $("secretMark").classList.add("hidden");
+  const img = document.createElement("img");
+  img.src = "photo2.png";
+  img.alt = "Николай Новиков";
+  img.onerror = () => {
+    img.remove();
+    $("secretMark").classList.remove("hidden");
+    $("secretMark").textContent = String(state.novikovPoints);
+  };
+  const box = document.querySelector(".secret-box");
+  if(!box.querySelector("img")) box.prepend(img);
+  $("secretDescription").textContent =
+    "Это баллы Новикова. Они начисляются за решения, повторяющие его исторический путь. После завершения игры станет понятно, насколько близко вы следовали его выбору.";
+}
+
+function openFinal(){
+  if(state.completed !== 6) return;
+  const allPoints = state.novikovPoints === 6;
+  const arrested = state.risk >= RISK_LIMIT;
+  const poor = state.capital < INITIAL_CAPITAL;
+  let title, body;
+
+  if(allPoints){
+    title = "Вы повторили путь Николая Новикова";
+    body = "Вы набрали все 6 баллов Новикова. Ваши решения повторили ключевые повороты его пути. Но просветительская деятельность имела свою цену: взгляды, издательские проекты и отношения с властью могли обернуться серьёзными последствиями.";
+  }else if(arrested){
+    title = "Издатель под надзором";
+    body = "Внимание властей достигло критического уровня. Ваш капитал уже не гарантирует безопасность: риск ареста и ссылки становится главным итогом выбранного пути.";
+  }else if(state.capital < 0){
+    title = "Издатель разорён";
+    body = "Ваш капитал ушёл в минус. Даже если некоторые решения приносили доход, расходы и обязательства оказались слишком велики. Издательское дело не выдержало финансовой нагрузки.";
+  }else if(poor){
+    title = "Осторожный, но неуспешный предприниматель";
+    body = "Вы сохранили относительную осторожность, однако капитал оказался меньше первоначальных 100 000 рублей. Ваши решения не привели к финансовому успеху.";
+  }else{
+    title = "Успешный издатель";
+    body = "Вы сохранили свободу действий и завершили путь с капиталом не ниже первоначального. Вы сумели управлять расходами и доходами, не доведя ситуацию до критического уровня.";
+  }
+
+  $("endingContent").innerHTML = "";
+  const h = document.createElement("h2");
+  h.textContent = title;
+  const p = document.createElement("p");
+  p.textContent = body;
+  const p2 = document.createElement("p");
+  p2.textContent = "Итоговый капитал: " + money(state.capital) +
+    ". Первоначальный капитал: " + money(INITIAL_CAPITAL) +
+    ". Внимание властей: " + state.risk +
+    ". Баллы Новикова: " + state.novikovPoints + " из 6.";
+
+  const img = document.createElement("img");
+  img.src = "photo2.png";
+  img.alt = "Николай Новиков";
+  img.onerror = () => img.remove();
+
+  $("endingContent").append(h,img,p,p2);
+  $("finalSummary").classList.remove("hidden");
+  $("finalSummaryContent").textContent =
+    "Капитал: " + money(state.capital) +
+    ". Расходы за весь путь: " + money(state.transactions.reduce((s,t)=>s+t.spent,0)) +
+    ". Доходы за весь путь: " + money(state.transactions.reduce((s,t)=>s+t.earned,0)) +
+    ". Чистый результат: " + signedMoney(state.capital - INITIAL_CAPITAL) + ".";
+
+  endingOverlay.classList.remove("hidden");
+}
+
+function restartGame(){
+  state.capital = INITIAL_CAPITAL;
+  state.risk = 0;
+  state.novikovPoints = 0;
+  state.completed = 0;
+  state.transactions = [];
+  state.warningShown = false;
+  state.pendingWarning = false;
+  state.currentQuestion = null;
+  state.currentResult = null;
+  state.finalShown = false;
+
+  [questionOverlay,warningOverlay,resultsOverlay,endingOverlay].forEach(el=>el.classList.add("hidden"));
+  $("finalSummary").classList.add("hidden");
+  $("secretMark").textContent = "?";
+  $("secretMark").classList.remove("hidden");
+  const secretImg = document.querySelector(".secret-box img");
+  if(secretImg) secretImg.remove();
+  $("secretDescription").textContent = "Что скрывается за этим показателем? Сделайте первый выбор, чтобы узнать больше.";
+  renderStats();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.querySelectorAll("[data-card]").forEach(button => {
+  button.addEventListener("click", () => openQuestion(Number(button.dataset.card)));
+});
+$("finalCard").addEventListener("click", openFinal);
+$("closeQuestion").addEventListener("click", () => questionOverlay.classList.add("hidden"));
+$("continueResults").addEventListener("click", closeResults);
+$("closeWarning").addEventListener("click", () => {
+  warningOverlay.classList.add("hidden");
+  if(state.completed === 6) $("finalCard").classList.add("available");
+});
+$("closeEnding").addEventListener("click", () => endingOverlay.classList.add("hidden"));
+$("restartGame").addEventListener("click", restartGame);
+
+const originalChooseOption = chooseOption;
+chooseOption = function(index, option){
+  originalChooseOption(index, option);
+  revealSecret();
+  if(state.currentResult) showToast(state.currentResult);
+};
+
+renderStats();
+</script>
+</body>
+</html>
